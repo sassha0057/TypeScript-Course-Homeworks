@@ -94,7 +94,7 @@ class Group {
   }
 
   showPerformance(): Student[] {
-    const sortedStudents = this._students.toSorted((a, b) => b.getPerformanceRating() - a.getPerformanceRating());
+    const sortedStudents = [...this._students].sort((a, b) => b.getPerformanceRating() - a.getPerformanceRating());
     return sortedStudents;
   }
 }
@@ -204,77 +204,5 @@ class School {
   }
 }
 
-const sharaga = new School();
-console.log(sharaga);
-
-const prepod1 = new Lecturer(
-  "Oleg", 
-  "Dushnila", 
-  "Pidor", 
-  "Huinya", 
-  15, 
-  ["Hui", "LOL"], 
-  "oleg@zaebal.com"
-);
-
-const prepod2 = new Lecturer(
-  "Vitalya", 
-  "Pizdabol", 
-  "Lox", 
-  "Valve incorporated", 
-  2, 
-  ["Dota 2"], 
-  "vitalya@naebal.com"
-);
-
-sharaga.addLecturer(prepod1);
-sharaga.addLecturer(prepod2);
-
-console.log(prepod1);
-console.log(prepod2);
-
-const sukaaa = new Area("Igrok v dotu");
-sharaga.addArea(sukaaa);
-
-const hardLevel = new Level("1400gpm", "Bf + pt 7 minuta");
-sukaaa.addLevel(hardLevel);
-console.log(sukaaa);
-
-const groupTupoy = new Group("Huesosi", GroupStatus.Active);
-hardLevel.addGroup(groupTupoy);
-
-console.log(hardLevel)
-
-const student1 = new Student("Loh", "Pedalniy", 2005);
-const student2 = new Student("Goy", "Progressivniy", 2004);
-const student3 = new Student("Mashina", "Ubiysa", 2000); 
-
-groupTupoy.addStudent(student1);
-groupTupoy.addStudent(student2);
-groupTupoy.addStudent(student3);
-
-console.log(student1);
-console.log(student2);
-console.log(student3);
-
-student1.setVisit("Para 1", false);
-student1.setVisit("Para 2", false);
-student1.setGrade("Domashka", 2);
-
-
-student2.setVisit("Para 1", true);
-student2.setVisit("Para 2", true);
-student2.setGrade("Domashka", 3);
-
-student3.setVisit("Para 1", true);
-student3.setVisit("Para 2", true);
-student3.setGrade("Domashka", 10);
-
-console.log("Spisok pidorasikov:");
-const topSpisok = groupTupoy.showPerformance();
-
-topSpisok.forEach((stud, index) => {
-  console.log(`${index + 1}. ${stud.fullName}: ${stud.getPerformanceRating()}`);
-});
 
 
