@@ -25,12 +25,13 @@ interface F extends E{
 }
 
 type correctValue = { [key: string]: number };
+type value = { [key: string]: any }
 
-function isCorrectValue(obj: { [key: string]: any }): obj is correctValue {
+function isCorrectValue(obj: value): obj is correctValue {
     return Object.values(obj).every((value) => typeof value === 'number');
 }
 
-function foo(obj: { [key: string]: any }): void {
+function foo(obj: value): void {
     if(isCorrectValue(obj)) {
         console.log('All values are numabers');
     } else {
