@@ -24,20 +24,28 @@ interface F extends E{
     age: number;
 }
 
-type correctValue = { [key: string]: number };
 type value = { [key: string]: any }
 
-function isCorrectValue(obj: value): obj is correctValue {
-    return Object.values(obj).every((value) => typeof value === 'number');
+function isCorrectValue<T>(obj: value, cbFn: (value: any) => value is T): obj is { [key: string]: T } {
+    return Object.keys(obj).every((key) => cbFn(obj[key]));
 }
 
-function foo(obj: value): void {
-    if(isCorrectValue(obj)) {
-        console.log('All values are numabers');
-    } else {
-        console.log('Incorrect values');
-    }
+const a: value = {
+    a: 5,
+    b: 's'
 }
+
+function valueIsNumber(value: any): value is number {
+    return typeof value === 'number';
+}
+
+if(isCorrectValue(a, valueIsNumber)) {
+    console.log('values are correct')
+} else {
+    console.log('values arent correct')
+}
+
+
 
 
 
