@@ -1,4 +1,6 @@
-type DeepReadonly<T> = T extends object
+type DeepReadonly<T> = T extends null | undefined
+    ? T
+    : T extends object
     ? { +readonly [K in keyof T]: DeepReadonly<T[K]>}
     : T;
 
@@ -20,7 +22,9 @@ const user1: DeepReadonly<IUser> = {
     }
 }
 
-type DeepRequireReadonly<T> = T extends object
+type DeepRequireReadonly<T> = T extends null | undefined 
+    ? T
+    : T extends object
     ? { +readonly [K in keyof T]-?: DeepReadonly<T[K]> }
     : T;
 
@@ -42,12 +46,7 @@ declare const user3: UpperCaseKeys<IUser>;
 
 
 type ObjectToPropertyDescriptor<T> = {
-    [K in keyof T]: {
-        value: T[K];
-        writable: boolean;
-        enumerable: boolean;
-        configurable: boolean;
-    }
+    [K in keyof T]: TypedPropertyDescriptor<T[K]>;
 }
 
 declare const user4: ObjectToPropertyDescriptor<IUser>;
