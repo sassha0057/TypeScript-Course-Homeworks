@@ -1,6 +1,4 @@
-type DeepReadonly<T> = T extends null | undefined
-    ? T
-    : T extends object
+type DeepReadonly<T> = T extends Record<string, unknown>
     ? { +readonly [K in keyof T]: DeepReadonly<T[K]>}
     : T;
 
@@ -22,9 +20,7 @@ const user1: DeepReadonly<IUser> = {
     }
 }
 
-type DeepRequireReadonly<T> = T extends null | undefined 
-    ? T
-    : T extends object
+type DeepRequireReadonly<T> = T extends Record<string, unknown>
     ? { +readonly [K in keyof T]-?: DeepReadonly<T[K]> }
     : T;
 
