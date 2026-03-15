@@ -53,7 +53,7 @@ class Task {
     createdAt: Date;
     updatedAt: Date;
     status: 'In Progress' | 'Completed';
-
+    
     constructor(name: string, content: string = '') {
         this.name = name;
         this.content = content;
