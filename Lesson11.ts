@@ -1,32 +1,44 @@
-class TodoList {
+class TodoList{
     public tasks: Task[] = [];
+    public search: Searching;
+    public sort: Sorting;
 
-    public addTask(name: string, content: string): void {
-        const newTask = new Task(name, content);
+    constructor() {
+        this.search = new Searching(this);
+        this.sort = new Sorting(this);
+    }
+
+    public addTask(name: string, content: string, type: 'Default' | 'Confirmable'): void {
+        const newTask = new Task(name, content, type);
         this.tasks.push(newTask);
     }
 
-    public removeTask(taskName: string): void {
-        this.tasks.filter(task => task.name !== taskName);
+    public removeTask(taskId: number): void {
+        this.tasks = this.tasks.filter(task => task.id !== taskId);
     }
 
-    public editTask(taskName: string, updates: Partial<Task>): boolean {
-        const task = this.tasks.find(task => task.name === taskName);
+    public editTask(taskId: number, updates: Partial<Task>, isConfirmed: boolean = false): boolean {
+        const task = this.tasks.find(task => task.id === taskId);
 
         if(!task) {
-            console.log(`Task "${taskName}" isn't found`)
-            return false
+            console.log(`Task with id "${taskId}" isn't found`);
+            return false;
+        }
+
+        if(task.type === 'Confirmable' && !isConfirmed) {
+            console.log(`Task "${taskId}" is needs additional verification`);
+            return false;
         }
 
         Object.assign(task, updates);
-
+        
         task.updatedAt = new Date();
-
+        
         return true;
     }
 
-    public taskInfo(taskName: string): Task | undefined {
-        return this.tasks.find(task => task.name === taskName);
+    public taskInfo(taskId: number): Task | undefined {
+        return this.tasks.find(task => task.id === taskId);
     }
 
     public allTaskList(): Task[] {
@@ -43,22 +55,60 @@ class TodoList {
         To completed tasks count: ${notCompletedTasksCount};
         `;
     }
-
-
 }
 
 class Task {
-    name: string;
-    content: string;
-    createdAt: Date;
-    updatedAt: Date;
-    status: 'In Progress' | 'Completed';
+    private static nextId: number = 1;
+
+    public id: number;
+    public name: string;
+    public content: string;
+    public createdAt: Date;
+    public updatedAt: Date;
+    public status: 'In Progress' | 'Completed';
+    public type: 'Default' | 'Confirmable';
     
-    constructor(name: string, content: string = '') {
+    constructor(name: string, content: string = '', type: 'Default' | 'Confirmable' = 'Default') {
+        this.id = Task.nextId++;
         this.name = name;
         this.content = content;
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.status = 'In Progress';
+        this.type = type;
+    }
+}
+
+class Searching {
+    private todoList: TodoList;
+
+    constructor(todoList: TodoList) {
+        this.todoList = todoList;
+    }
+
+    public searchByName(taskName: string): Task | undefined  {
+        return this.todoList.tasks.find(task => task.name === taskName);
+    }
+
+    public searchByContent(taskContent: string): Task | undefined  {
+        return this.todoList.tasks.find(task => task.content === taskContent);
+    }
+}
+
+class Sorting {
+    private todoList: TodoList;
+
+    constructor(todoList: TodoList) {
+        this.todoList = todoList;
+    }
+
+    public sortByStatus(): Task[] {
+        const toSortArr = [...this.todoList.tasks];
+        return toSortArr.sort((a, b) => a.status.localeCompare(b.status));
+    }
+
+    public sortByCreationDate(): Task[] {
+        const toSortArr = [...this.todoList.tasks];
+        return toSortArr.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     }
 }
