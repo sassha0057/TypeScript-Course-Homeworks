@@ -1,5 +1,5 @@
 class TodoList{
-    public tasks: Task[] = [];
+    private tasks: Task[] = [];
     public search: Searching;
     public sort: Sorting;
 
@@ -9,6 +9,10 @@ class TodoList{
     }
 
     public addTask(name: string, content: string, type: 'Default' | 'Confirmable'): void {
+        if (!name.trim()) {
+            console.log('Name cannot be empty');
+        }
+
         const newTask = new Task(name, content, type);
         this.tasks.push(newTask);
     }
@@ -26,7 +30,7 @@ class TodoList{
         }
 
         if(task.type === 'Confirmable' && !isConfirmed) {
-            console.log(`Task "${taskId}" is needs additional verification`);
+            console.log(`Task with id "${taskId}" is needs additional verification`);
             return false;
         }
 
@@ -41,18 +45,27 @@ class TodoList{
         return this.tasks.find(task => task.id === taskId);
     }
 
-    public allTaskList(): Task[] {
+    public allTasksList(): Task[] {
         return this.tasks;
     }
 
-    public notCompletedTasks(): string {
-        const allTasksCount = this.tasks.length;
-        const completedTasksCount = this.tasks.filter(task => task.status === 'Completed').length;
-        const notCompletedTasksCount = allTasksCount - completedTasksCount;
+    public allTasksCount(): number {
+        return this.tasks.length;
+    }
+
+    public completedTasksCount(): number {
+        return this.tasks.filter(task => task.status === 'Completed').length;
+    }
+
+    public notCompletedTasksCount(): number {
+        return this.allTasksCount() - this.completedTasksCount();
+    }
+
+    public statusOfTasks(): string {
         return `
-        All tasks count: ${allTasksCount};
-        Completed tasks count: ${completedTasksCount}; 
-        To completed tasks count: ${notCompletedTasksCount};
+            All tasks count: ${this.allTasksCount()};
+            Completed tasks count: ${this.completedTasksCount()}; 
+            To completed tasks count: ${this.notCompletedTasksCount()};
         `;
     }
 }
@@ -86,12 +99,14 @@ class Searching {
         this.todoList = todoList;
     }
 
-    public searchByName(taskName: string): Task | undefined  {
-        return this.todoList.tasks.find(task => task.name === taskName);
+    public searchByName(searchQuery: string): Task[] {
+        const query = searchQuery.toLowerCase();
+        return this.todoList.allTasksList().filter(task => task.name.toLowerCase().includes(query));
     }
 
-    public searchByContent(taskContent: string): Task | undefined  {
-        return this.todoList.tasks.find(task => task.content === taskContent);
+    public searchByContent(searchQuery: string): Task[] {
+        const query = searchQuery.toLowerCase();
+        return this.todoList.allTasksList().filter(task => task.content.toLowerCase().includes(query));
     }
 }
 
@@ -103,12 +118,12 @@ class Sorting {
     }
 
     public sortByStatus(): Task[] {
-        const toSortArr = [...this.todoList.tasks];
+        const toSortArr = [...this.todoList.allTasksList()];
         return toSortArr.sort((a, b) => a.status.localeCompare(b.status));
     }
 
     public sortByCreationDate(): Task[] {
-        const toSortArr = [...this.todoList.tasks];
+        const toSortArr = [...this.todoList.allTasksList()];
         return toSortArr.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     }
 }
