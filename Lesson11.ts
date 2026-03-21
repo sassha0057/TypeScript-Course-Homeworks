@@ -1,4 +1,36 @@
-class TodoList{
+type ValidStatus = 'In Progress' | 'Completed';
+type ValidType = 'Default' | 'Confirmable';
+type StatusOfTasks = {
+    total: number,
+    completed: number,
+    uncompleted: number
+}
+
+
+interface ITodoList {
+    addTask(name: string, content: string, type: ValidType): void;
+    removeTask(taskId: number): void;
+    editTask(taskId: number, updates: Partial<Task>, isConfirmed: boolean): boolean;
+    taskInfo(taskId: number): Task | undefined;
+    allTasksList(): Task[];
+    allTasksCount(): number;
+    completedTasksCount(): number;
+    notCompletedTasksCount(): number;
+    statusOfTasks(): StatusOfTasks;
+}
+
+interface ITask {
+    id: number;
+    name: string;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+    status: ValidStatus;
+    type: ValidType;
+}
+
+
+class TodoList implements ITodoList {
     private tasks: Task[] = [];
     public search: Searching;
     public sort: Sorting;
@@ -8,9 +40,9 @@ class TodoList{
         this.sort = new Sorting(this);
     }
 
-    public addTask(name: string, content: string, type: 'Default' | 'Confirmable'): void {
+    public addTask(name: string, content: string, type: ValidType): void {
         if (!name.trim()) {
-            console.log('Name cannot be empty');
+            throw new Error('Name cannot be empty');
         }
 
         const newTask = new Task(name, content, type);
@@ -25,13 +57,11 @@ class TodoList{
         const task = this.tasks.find(task => task.id === taskId);
 
         if(!task) {
-            console.log(`Task with id "${taskId}" isn't found`);
-            return false;
+            throw new Error(`Task with id "${taskId}" isn't found`);
         }
 
         if(task.type === 'Confirmable' && !isConfirmed) {
-            console.log(`Task with id "${taskId}" is needs additional verification`);
-            return false;
+            throw new Error(`Task with id "${taskId}" is needs additional verification`);
         }
 
         Object.assign(task, updates);
@@ -61,16 +91,16 @@ class TodoList{
         return this.allTasksCount() - this.completedTasksCount();
     }
 
-    public statusOfTasks(): string {
-        return `
-            All tasks count: ${this.allTasksCount()};
-            Completed tasks count: ${this.completedTasksCount()}; 
-            To completed tasks count: ${this.notCompletedTasksCount()};
-        `;
+    public statusOfTasks(): StatusOfTasks {
+        return {
+            total: this.allTasksCount(),
+            completed: this.completedTasksCount(),
+            uncompleted: this.notCompletedTasksCount()
+        }
     }
 }
 
-class Task {
+class Task implements ITask {
     private static nextId: number = 1;
 
     public id: number;
@@ -78,10 +108,10 @@ class Task {
     public content: string;
     public createdAt: Date;
     public updatedAt: Date;
-    public status: 'In Progress' | 'Completed';
-    public type: 'Default' | 'Confirmable';
+    public status: ValidStatus;
+    public type: ValidType;
     
-    constructor(name: string, content: string = '', type: 'Default' | 'Confirmable' = 'Default') {
+    constructor(name: string, content: string = '', type: ValidType = 'Default') {
         this.id = Task.nextId++;
         this.name = name;
         this.content = content;
