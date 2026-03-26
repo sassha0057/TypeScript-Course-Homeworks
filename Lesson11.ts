@@ -13,9 +13,6 @@ interface ITodoList {
     editTask(taskId: number, updates: Partial<Task>, isConfirmed: boolean): boolean;
     taskInfo(taskId: number): Task | undefined;
     allTasksList(): Task[];
-    allTasksCount(): number;
-    completedTasksCount(): number;
-    notCompletedTasksCount(): number;
     statusOfTasks(): StatusOfTasks;
 }
 
@@ -27,6 +24,16 @@ interface ITask {
     updatedAt: Date;
     status: ValidStatus;
     type: ValidType;
+}
+
+interface ISearching {
+    searchByName(searchQuery: string): Task[];
+    searchByContent(searchQuery: string): Task[];
+}
+
+interface ISorting {
+    sortByStatus(): Task[];
+    sortByCreationDate(): Task[];
 }
 
 
@@ -79,15 +86,15 @@ class TodoList implements ITodoList {
         return this.tasks;
     }
 
-    public allTasksCount(): number {
+    private allTasksCount(): number {
         return this.tasks.length;
     }
 
-    public completedTasksCount(): number {
+    private completedTasksCount(): number {
         return this.tasks.filter(task => task.status === 'Completed').length;
     }
 
-    public notCompletedTasksCount(): number {
+    private notCompletedTasksCount(): number {
         return this.allTasksCount() - this.completedTasksCount();
     }
 
@@ -122,7 +129,7 @@ class Task implements ITask {
     }
 }
 
-class Searching {
+class Searching implements ISearching {
     private todoList: TodoList;
 
     constructor(todoList: TodoList) {
@@ -140,7 +147,7 @@ class Searching {
     }
 }
 
-class Sorting {
+class Sorting implements ISorting {
     private todoList: TodoList;
 
     constructor(todoList: TodoList) {
